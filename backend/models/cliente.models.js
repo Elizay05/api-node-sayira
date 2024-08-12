@@ -11,12 +11,14 @@ const clienteSchema = new conexion.Schema({
         required: [true, 'El email es obligatorio']
     },
     usuario: {
-        type: String,
+        type: conexion.SchemaTypes.ObjectId,
+        ref: 'User',
         required: [true, 'El usuario es obligatorio']
     },
     direccion: {
         type: String,
-        required: [true, 'La dirección es obligatoria']
+        required: [true, 'La dirección es obligatoria'],
+        minLength: [5, 'La dirección debe tener más de 5 caracteres']
     },
     saldo: {
         type: Number,
@@ -27,7 +29,7 @@ const clienteSchema = new conexion.Schema({
         type: Date,
         default: Date.now
     }
-});
+}, { versionKey: false });
 
 const clienteModel = conexion.model('clientes', clienteSchema);
 

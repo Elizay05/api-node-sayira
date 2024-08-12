@@ -8,6 +8,8 @@ const logger = require("morgan");
 require('dotenv').config();
 
 const app = exp();
+const emailService = require('./backend/utils/email.service');
+
 app.use(exp.urlencoded({ extended: false }));
 app.use(exp.json());
 app.use(logger("dev"));
@@ -56,6 +58,11 @@ app.post("/usuarios", async (req, res) => {
     };
     let consulta = await modeloUsuario.create(nuevo);
     if (consulta) {
+        await emailService.sendEmail(
+            "sayiis2005@gmail.com",
+            "Usuario Creado",
+            "Usuario creadido exitosamente",
+        );  
         res.status(200).json("Usuario creado");
     }
     else {
@@ -297,5 +304,43 @@ app.delete('/pedidos/:cliente', async (req, res) => {
     }
 });
 
+
+app.get('/enviarcorreo', async (req, res) => {
+    await emailService.sendEmail(
+        "sayiis2005@gmail.com",
+        "Confirmación de Registro",
+        "Bienvenido a la tienda en línea más top de todo el mundo",
+    );  
+})
+
+
+app.post('/registrocompleto', async (req, res) => {
+    try {
+        const usuario = {
+            correo: "correo.academico.laboral@gmail.com",
+            pass: "123456",
+            rol: "cliente",
+            habilitado: true,
+        };
+        let consulta = await modeloUsuario.create(usuario);
+        if (consulta) {
+            console.log(consulta._id)
+            const cliente = {
+                nombre: "Carmelo Alzate",
+                correo: "correo.academico.laboral@gmail.com",
+                direccion: "CRR 23 D SUR # 80 - 20",
+                saldo: "126000",
+                fechaRegistro: Date.now(),
+                usuario: consulta._id
+            }
+            res.status(200).json("Usuario creado");
+        }
+        else {
+            res.status(404).json("No se pudo crear el usuario");
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
 
 app.listen(process.env.PORT)

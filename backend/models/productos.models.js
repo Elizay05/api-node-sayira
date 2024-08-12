@@ -37,7 +37,7 @@ const productoSchema = new conexion.Schema({
             required: [true, 'Las imágenes son obligatorias']
         }
     ],
-});
+}, { versionKey: false });
 
 const productoModel = conexion.model('productos', productoSchema);
 
