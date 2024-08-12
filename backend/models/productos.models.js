@@ -39,6 +39,6 @@ const productoSchema = new conexion.Schema({
     ],
 });
 
-const productoModel = conexion.model('productos', productoSchema);
+const productoModel = conexion.model('Productos', productoSchema);
 
 module.exports = productoModel;

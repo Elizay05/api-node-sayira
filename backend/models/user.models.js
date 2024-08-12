@@ -23,6 +23,6 @@ const userSchema = new conexion.Schema({
     }
 });
 
-const userModel = conexion.model('usuarios', userSchema);
+const userModel = conexion.model('Usuarios', userSchema);
 
 module.exports = userModel;

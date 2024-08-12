@@ -29,6 +29,6 @@ const clienteSchema = new conexion.Schema({
     }
 });
 
-const clienteModel = conexion.model('clientes', clienteSchema);
+const clienteModel = conexion.model('Clientes', clienteSchema);
 
 module.exports = clienteModel;
