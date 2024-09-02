@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+    <table class="table" id="productos">
+        <thead>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Descripcion</th>
+            <th>Precio</th>
+            <th>Categoria</th>
+            <th>Imagenes</th>
+            <th>acciones</th>
+        </thead>
+        <tbody>
+            <% productos.forEach(producto=> { %>
+                <tr>
+                    <td>
+                        <%= producto._id %>
+                    </td>
+                    <td>
+                        <%= producto.title %>
+                    </td>
+                    <td>
+                        <%= producto.description %>
+                    </td>
+                    <td>
+                        <%= producto.price %>
+                    </td>
+                    <td>
+                        <% if (producto.category) { %>
+                            <%= producto.category.nombre %>
+                        <% } else { %>
+                            <%= "Categoría no disponible" %>
+                        <% } %>
+                    </td>
+                    <td>
+                        <%= producto.images %>
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editModal" onclick=""><i
+                                class="bi bi-pencil"></i></button>
+                        <button class="btn btn-outline-danger" onclick=""><i class="bi bi-trash"></i></button>
+
+                    </td>
+                </tr>
+
+                <%})%>
+        </tbody>
+    </table>
+
+    <%- include ('../partials/footer'); %>
+
+    <script>
+        new DataTable('#productos');
+    </script>
+
+</body>

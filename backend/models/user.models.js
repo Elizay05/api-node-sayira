@@ -1,6 +1,6 @@
 const conexion = require('../config/connection')
 
-const userSchema = new conexion.Schema({
+const usuarioSchema = new conexion.Schema({
     correo:{
         type: String,
         unique: [true, 'El correo ya existe'],
@@ -23,6 +23,6 @@ const userSchema = new conexion.Schema({
     }
 }, { versionKey: false });
 
-const userModel = conexion.model('usuarios', userSchema);
+const usuarioModel = conexion.model('Usuario', usuarioSchema);
 
-module.exports = userModel;
+module.exports = usuarioModel;

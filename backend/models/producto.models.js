@@ -1,10 +1,6 @@
 const conexion = require('../config/connection');
 
 const productoSchema = new conexion.Schema({
-    id: {
-        type: Number,
-        required: [true, 'El ID es obligatorio']
-    },
     title: {
         type: String,
         required: [true, 'El título es obligatorio']
@@ -18,18 +14,9 @@ const productoSchema = new conexion.Schema({
         required: [true, 'El precio es obligatorio']
     },
     category: {
-        id: {
-            type: Number,
-            required: [true, 'El ID de la categoría es obligatorio']
-        },
-        name: {
-            type: String,
-            required: [true, 'El nombre de la categoría es obligatorio']
-        },
-        image: {
-            type: String,
-            required: [true, 'La imagen de la categoría es obligatoria']
-        }
+        type: conexion.SchemaTypes.ObjectId,
+        ref: 'Categoria',
+        required: [true, 'La categoria es obligatoria']
     },
     images: [
         {
@@ -39,6 +26,6 @@ const productoSchema = new conexion.Schema({
     ],
 }, { versionKey: false });
 
-const productoModel = conexion.model('productos', productoSchema);
+const productoModel = conexion.model('Producto', productoSchema);
 
 module.exports = productoModel;

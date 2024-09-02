@@ -40,6 +40,6 @@ const pedidoSchema = new conexion.Schema({
 }, { versionKey: false });
 
 // Usa `mongoose.models` para evitar sobrescribir el modelo
-const pedidoModel = conexion.models.pedidos || conexion.model('pedidos', pedidoSchema);
+const pedidoModel = conexion.models.pedidos || conexion.model('Pedido', pedidoSchema);
 
 module.exports = pedidoModel;

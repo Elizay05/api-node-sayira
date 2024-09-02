@@ -1,26 +1,31 @@
 const exp = require("express");
-const modeloUsuario = require("./backend/models/user.models");
+const usuarioModel = require('./backend/models/user.models');
 const clienteModel = require('./backend/models/cliente.models');
-const productoModel = require('./backend/models/productos.models');
-const pedidoModel = require('./backend/models/pedidos.models');
+const categoriaModel = require('./backend/models/categoria.model');
+const pedidoModel = require('./backend/models/pedido.models');
 const mongoose = require('mongoose');
 const logger = require("morgan");
 require('dotenv').config();
 
-const app = exp();
-const emailService = require('./backend/utils/email.service');
+const router = require('./backend/router/router');
 
-app.use(exp.urlencoded({ extended: false }));
-app.use(exp.json());
+const app = exp();
+
 app.use(logger("dev"));
+app.use(exp.json());
+app.use(exp.urlencoded({ extended: false }));
+
+app.use('/api', router);
+
+const emailService = require('./backend/utils/email.service');
 
 
 const path = require('path')
 app.set("view engine", "ejs");
 app.set('views', path.join(__dirname, '/frontend/views'));
 
-app.get('/mostrar', async (req, res) => {
-    const consulta = await modeloUsuario.find({});
+app.get('/', async (req, res) => {
+    const consulta = await usuarioModel.find({});
 
     res.render('pages/index', {
         usuarios: consulta,
@@ -28,74 +33,109 @@ app.get('/mostrar', async (req, res) => {
     });
 })
 
-app.get("/usuarios", async (req, res) => { // es una promesa que cuando queramos hacer una funcion el await dice que hay que esperar que este caido o no entonces es una promesa
-    const consulta = await modeloUsuario.find({});
-    if (consulta) {
-        res.status(200).json(consulta);
-    }
-    else {
-        res.status(404).json("No hay usuarios");
+app.get("/usuarios", async (req, res) => {
+    try {
+        const usuarios = await usuarioModel.find();
+
+        if (usuarios) {
+            return res.status(200).json(usuarios);
+        } else {
+            return res.status(404).json({ message: "No hay usuarios registrados" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "Ocurrió un error al obtener los usuarios", error: error.message });
     }
 });
 
-app.get("/usuarios/:correo", async (req, res) => {
-    const busqueda = await modeloUsuario.findOne({ correo: req.params.correo });
-    if (busqueda) {
-        res.status(200).json(busqueda);
-    }
-    else {
-        res.status(404).json("No hay usuarios");
+app.get("/usuarios/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const usuario = await usuarioModel.findById(id);
+
+        if (usuario) {
+            return res.status(200).json(usuario);
+        } else {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "Ocurrió un error al buscar el usuario", error: error.message });
     }
 });
 
 app.post("/usuarios", async (req, res) => {
-    console.log(req.body)
-    const nuevo = {
-        correo: req.body.correo,
-        pass: req.body.pass,
-        rol: req.body.rol,
-        habilitado: true,
-    };
-    let consulta = await modeloUsuario.create(nuevo);
-    if (consulta) {
-        await emailService.sendEmail(
-            "sayiis2005@gmail.com",
-            "Usuario Creado",
-            "Usuario creadido exitosamente",
-        );  
-        res.status(200).json("Usuario creado");
-    }
-    else {
-        res.status(404).json("No se pudo crear el usuario");
-    }
-});
+    try {
+        const usuarioExistente = await usuarioModel.findOne({ correo: req.body.correo });
+        if (usuarioExistente) {
+            return res.status(400).json({ message: "El correo ya está registrado" });
+        }
 
+        const nuevo = {
+            correo: req.body.correo,
+            pass: req.body.pass,
+            rol: req.body.rol,
+            habilitado: true,
+        };
 
-app.put("/usuarios/:correo", async (req, res) => {
-    const nombreUser = req.body.nombreuser;
-    const usuarioEditado = {
-        nombre: nombreUser,
-        correo: req.body.correouser,
-        pasword: req.body.passworduser,
-        rol: req.body.roluser,
-        habilitado: true,
-    };
-    let actualizado = await modeloUsuario.findOneAndUpdate({ nombre: nombreUser }, usuarioEditado);
-    if (actualizado) {
-        res.json(actualizado);
-    } else {
-        res.status(404).json({ message: "Usuario no encontrado" });
+        let consulta = await usuarioModel.create(nuevo);
+        if (consulta) {
+            await emailService.sendEmail(
+                "sayiis2005@gmail.com",
+                "Usuario Creado",
+                "Usuario creado exitosamente",
+            );
+            res.status(200).json(consulta);
+        } else {
+            res.status(404).json({message: "No se pudo crear el usuario"});
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Ocurrió un error al crear el usuario", error: error.message });
     }
 });
 
 
-app.delete("/usuarios/:correo", async (req, res) => {
-    console.log(req.body.correo, req.body.correouser)
-    let eliminacion = await modeloUsuario.findOneAndDelete({ correo: req.body.correo });
-    if (eliminacion) {
-        res.json(eliminacion);
-    } else {
-        res.status(404).json({ message: "Usuario no encontrado" });
+app.put("/usuarios/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { correo, password, rol } = req.body;
+
+        const correoExistente = await usuarioModel.findOne({ correo, _id: { $ne: id } });
+        if (correoExistente) {
+            return res.status(400).json({ message: "El correo ya está en uso por otro usuario" });
+        }
+
+        const usuarioEditado = {
+            correo: correo,
+            password: password,
+            rol: rol,
+            habilitado: true,
+        };
+
+        const actualizado = await usuarioModel.findByIdAndUpdate(id, usuarioEditado, { new: true });
+
+        if (actualizado) {
+            res.json(actualizado);
+        } else {
+            res.status(404).json({ message: "Usuario no encontrado" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Error al actualizar el usuario", error: error.message });
+    }
+});
+
+app.delete("/usuarios/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const eliminacion = await usuarioModel.findByIdAndDelete(id);
+
+        if (eliminacion) {
+            return res.status(200).json({ message: "Usuario eliminado exitosamente", usuario: eliminacion });
+        } else {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "Ocurrió un error al eliminar el usuario", error: error.message });
     }
 });
 
@@ -164,70 +204,111 @@ app.delete('/clientes/:correo', async (req, res) => {
 });
 
 
-// Rutas para el modelo producto
-app.get('/productos', async (req, res) => {
-    try {
-        const productos = await productoModel.find({});
-        res.status(200).json(productos);
-    } catch (error) {
-        res.status(500).json({ message: 'Pedido no encontrado'});
-    }
-});
 
-app.get('/productos/:precio', async (req, res) => {
+
+// Rutas para categorias
+
+app.get('/categorias', async (req, res) => {
     try {
-        // Buscar el producto por el campo `precio`
-        const producto = await productoModel.findOne({ price: req.params.precio });
-        if (producto) {
-            res.status(200).json(producto);
+        const categorias = await categoriaModel.find();
+
+        if (categorias) {
+            return res.status(200).json(categorias);
         } else {
-            res.status(404).json({ message: 'Producto no encontrado' });
+            return res.status(404).json({ message: "No hay categorias registradas" });
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Ocurrió un error al obtener las categorias", error: error.message });
     }
-});
+})
 
 
-app.post('/productos', async (req, res) => {
+app.get("/categorias/:id", async (req, res) => {
     try {
-        const nuevoProducto = new productoModel(req.body);
-        const producto = await nuevoProducto.save();
-        res.status(201).json(producto);
-    } catch (error) {
-        res.status(400).json({ message: 'No se pudo registrar el producto: ' + error.message });
-    }
-});
+        const { id } = req.params;
 
+        const categoria = await categoriaModel.findById(id);
 
-app.put('/productos/:title', async (req, res) => {
-    try {
-        const producto = await productoModel.findOneAndUpdate(
-            { title: req.params.title },req.body,{ new: true });
-
-        if (producto) {
-            res.status(200).json({ message: 'Producto actualizado correctamente', producto });
+        if (categoria) {
+            return res.status(200).json(categoria);
         } else {
-            res.status(404).json({ message: 'Producto no encontrado' });
+            return res.status(404).json({ message: "Categoria no encontrada" });
         }
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: "Ocurrió un error al buscar la categoria", error: error.message });
+    }
+});
+
+
+app.post('/categorias', async (req, res) => {
+    try {
+
+        const categoriaExistente = await categoriaModel.findOne({ nombre: req.body.nombre });
+        if (categoriaExistente) {
+            return res.status(400).json({ message: "La categoria ya está registrada" });
+        }
+
+        const nuevo = {
+            nombre: req.body.nombre,
+            descripcion: req.body.descripcion,
+            image: req.body.image
+        };
+
+        let categoriaNueva = await categoriaModel.create(nuevo);
+        if (categoriaNueva) {
+            res.status(200).json(categoriaNueva);
+        } else {
+            res.status(404).json({ message: 'No se pudo registrar la categoria' });
+        }
+    } catch (error) {
+        res.status(400).json({ message: 'Ocurrio un error al registrar la categoria: ' + error.message });
     }
 });
 
 
 
-app.delete('/productos/:title', async (req, res) => {
+app.put("/categorias/:id", async (req, res) => {
     try {
-        const producto = await productoModel.findOneAndDelete({ title: req.params.title });
-        
-        if (producto) {
-            res.status(200).json({ message: 'Producto eliminado correctamente', producto });
+        const { id } = req.params;
+        const { nombre, descripcion, image } = req.body;
+
+        const categoriaExistente = await categoriaModel.findOne({ nombre: nombre });
+        if (categoriaExistente) {
+            return res.status(400).json({ message: "La categoria ya está registrada" });
+        }
+
+        const categoriaEditada = {
+            nombre: nombre,
+            descripcion: descripcion,
+            image: image,
+        };
+
+        const actualizado = await categoriaModel.findByIdAndUpdate(id, categoriaEditada, { new: true });
+
+        if (actualizado) {
+            res.json(actualizado);
         } else {
-            res.status(404).json({ message: 'Producto no encontrado' });
+            res.status(404).json({ message: "Categoria no encontrada" });
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Error al actualizar la categoria", error: error.message });
+    }
+});
+
+
+app.delete("/categorias/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const eliminacion = await categoriaModel.findByIdAndDelete(id);
+
+        if (eliminacion) {
+            return res.status(200).json({ message: "Categoria eliminada exitosamente", categoria: eliminacion });
+        } else {
+            return res.status(404).json({ message: "Categoria no encontrada" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "Ocurrió un error al eliminar la categoria", error: error.message });
     }
 });
 
