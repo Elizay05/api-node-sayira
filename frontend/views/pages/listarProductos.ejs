@@ -6,53 +6,30 @@
     <%- include('../partials/head'); %>
 </head>
 
-<body class="container">
-    <table class="table" id="productos">
-        <thead>
-            <th>ID</th>
-            <th>Producto</th>
-            <th>Descripcion</th>
-            <th>Precio</th>
-            <th>Categoria</th>
-            <th>Imagenes</th>
-            <th>acciones</th>
-        </thead>
-        <tbody>
-            <% productos.forEach(producto=> { %>
-                <tr>
-                    <td>
-                        <%= producto._id %>
-                    </td>
-                    <td>
-                        <%= producto.title %>
-                    </td>
-                    <td>
-                        <%= producto.description %>
-                    </td>
-                    <td>
-                        <%= producto.price %>
-                    </td>
-                    <td>
-                        <% if (producto.category) { %>
-                            <%= producto.category.nombre %>
-                        <% } else { %>
-                            <%= "Categoría no disponible" %>
-                        <% } %>
-                    </td>
-                    <td>
-                        <%= producto.images %>
-                    </td>
-                    <td>
-                        <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editModal" onclick=""><i
-                                class="bi bi-pencil"></i></button>
-                        <button class="btn btn-outline-danger" onclick=""><i class="bi bi-trash"></i></button>
+<body>
 
-                    </td>
-                </tr>
+    <%- include('../partials/header'); %>
 
-                <%})%>
-        </tbody>
-    </table>
+
+    
+    <div class="d-flex justify-content-start flex-wrap gap-3 m-5">
+        <% productos.forEach(producto => { %>
+            <div class="card" style="width: 18rem;">
+                <% producto.images.forEach(imageUrl => { %>
+                    <img src="<%= imageUrl %>" class="card-img-top" alt="...">
+                <% }) %>
+                <div class="card-body">
+                    <h5 class="card-title"><%= producto.title %></h5>
+                    <p class="card-text">$ <%= producto.price %></p>
+                    <small class="card-text"><%= producto._id %></small>
+                    <a href="#" class="btn btn-outline-primary"><i class="bi bi-bag"></i></a>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+    
+
 
     <%- include ('../partials/footer'); %>
 

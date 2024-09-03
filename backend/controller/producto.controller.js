@@ -64,11 +64,16 @@ exports.actualizarProducto = async (req, res) => {
 
         const { nombre, descripcion, precio, categoria, images } = req.body;
 
-        const productoExistente = await productoModel.findOne({ title: nombre});
-        if (productoExistente) {
-            return res.status(400).json({ message: "El producto ya está registrado" });
+        const productoActual = await productoModel.findById(id);
+        if (!productoActual) {
+            return res.status(404).json({ message: "Producto no encontrado" });
         }
 
+        const productoExistente = await productoModel.findOne({ title: nombre });
+        if (productoExistente && productoExistente._id.toString() !== id) {
+            return res.status(400).json({ message: "Este producto ya está registrado" });
+        }
+        
         const productoEditado = {
             title: nombre,
             description: descripcion,

@@ -1,4 +1,4 @@
-const categoriaModel = require('../models/categoria.model');
+const categoriaModel = require('../models/categoria.models');
 
 
 exports.verCategorias = async (req, res) => {
@@ -60,12 +60,19 @@ exports.crearCategoria = async (req, res) => {
 
 exports.actualizarCategoria = async (req, res) => {
     try {
+
+        const { id } = req.params
+
         const { nombre, descripcion, image } = req.body;
 
-        const categoriaExistente = await categoriaModel.findById(req.params.id);
+        const categoriaActual = await categoriaModel.findById(id);
+        if (!categoriaActual) {
+            return res.status(404).json({ message: "Categoria no encontrada" });
+        }
 
-        if (categoriaExistente) {
-            return res.status(400).json({ message: "La categoria ya está registrada" });
+        const categoriaExistente = await categoriaModel.findOne({ nombre: nombre });
+        if (categoriaExistente && categoriaExistente._id.toString() !== id) {
+            return res.status(400).json({ message: "Esta categoria ya está registrada" });
         }
 
         const categoriaEditada = {
