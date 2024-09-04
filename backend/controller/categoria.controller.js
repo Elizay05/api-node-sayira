@@ -6,7 +6,7 @@ exports.verCategorias = async (req, res) => {
         const categorias = await categoriaModel.find();
 
         if (categorias) {
-            return res.status(200).json(categorias);
+            return categorias;
         } else {
             return res.status(404).json({ message: "No hay categorias registradas" });
         }

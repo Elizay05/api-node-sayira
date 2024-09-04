@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -9,10 +10,25 @@
 
     <%- include('../partials/header'); %>
 
-    
-      <footer>
-        <%- include('../partials/footer'); %>
-      </footer>
-</body>
 
-</html>
+    <!-- Tarjetas de productos -->
+    <div class="d-flex justify-content-start flex-wrap gap-3 m-5">
+        <% productos.forEach(producto => { %>
+            <div class="card" style="width: 18rem;">
+                  <img src="<%= producto.image %>" class="card-img-top" alt="<%= producto.title %>">
+                <div class="card-body">
+                    <input type="hidden" id="id_<%= producto._id %>" value="<%= producto._id %>">
+                    <h5 class="card-title"><%= producto.title %></h5>
+                    <small class="card-text"><%= producto.category.nombre %></small>
+                    <div class="d-flex justify-content-between">
+                        <p class="card-text fs-5 fw-bold">$ <%= producto.price %></p>
+                    </div>
+                    <button class="btn btn-outline-primary w-100 mt-3" onclick="agregarBolsa('<%= producto._id %>', '<%= producto.title %>', '<%= producto.category.nombre %>', '<%= producto.description %>', '<%= producto.price %>', '<%= producto.image %>')">Agregar al carrito</button>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+
+    <%- include ('../partials/footer'); %>
+
+</body>

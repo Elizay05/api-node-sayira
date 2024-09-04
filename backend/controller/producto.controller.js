@@ -4,7 +4,7 @@ exports.verProductos = async(req, res) => {
     try {
         const productos = await productoModel.find().populate('category');
         if (productos) {
-            return res.render('pages/listarProductos', { productos });
+            return productos
         } else {
             return res.status(404).json({ message: 'No se encontraron productos' });
         }
@@ -58,11 +58,11 @@ exports.crearProducto = async (req, res) => {
 }
 
 
-exports.actualizarProducto = async (req, res) => {
+exports.actualizarProducto = async (req, res, ruta) => {
     try {
         const { id } = req.params;
 
-        const { nombre, descripcion, precio, categoria, imagenes } = req.body;
+        const { nombre, descripcion, precio, categoria, imagen } = req.body;
 
         const productoActual = await productoModel.findById(id);
         if (!productoActual) {
@@ -79,13 +79,13 @@ exports.actualizarProducto = async (req, res) => {
             description: descripcion,
             price: precio,
             category: categoria,
-            images: imagenes
+            image: imagen
         };
 
         const actualizado = await productoModel.findByIdAndUpdate(id, productoEditado, { new: true });
 
         if (actualizado) {
-            res.json(actualizado);
+            res.redirect(ruta);
         } else {
             res.status(404).json({ message: "Producto no encontrado" });
         }

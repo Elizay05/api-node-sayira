@@ -8,13 +8,8 @@ const controladorUsuarios = require('../controller/usuario.controller')
 
 // INDEX
 router.get('/index', async (req, res) => {
-    res.render('pages/index');
-});
-
-
-// BOLSA DE COMPRA
-router.get('/bolsa', async (req, res) => {
-    res.render('pages/bolsaCompra');
+    const productos = await controladorProductos.verProductos()
+    res.render('pages/index', {productos})
 });
 
 
@@ -27,10 +22,20 @@ router.delete('/categorias/:id', controladorCategorias.eliminarCategoria);
 
 
 // PRODUCTOS
-router.get('/productos', controladorProductos.verProductos);
+router.get('/productos', async (req, res) => {
+    const productos = await controladorProductos.verProductos(req, res)
+    const categorias = await controladorCategorias.verCategorias(req, res)
+    res.render('pages/listarProductos', {productos, categorias})
+});
+
 router.get('/productos/:id', controladorProductos.verProducto);
+
 router.post('/productos', controladorProductos.crearProducto);
-router.put('/productos/:id', controladorProductos.actualizarProducto);
+
+router.post('/productos/:id', async (req, res) => {
+    controladorProductos.actualizarProducto(req, res, '/api/productos');
+});
+
 router.delete('/productos/:id', controladorProductos.eliminarProducto);
 
 // USUARIOS

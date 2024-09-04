@@ -11,49 +11,147 @@
     <%- include('../partials/header'); %>
 
 
-    <!-- Tarjetas de productos -->
-    <div class="d-flex justify-content-start flex-wrap gap-3 m-5">
-        <% productos.forEach(producto => { %>
-            <div class="card" style="width: 18rem;">
-                <% producto.images.forEach(imageUrl => { %>
-                    <img src="<%= imageUrl %>" class="card-img-top" alt="...">
+    <!-- Tabla de Productos -->
+    <div class="m-5">
+        <h2 class="text-center m-5">Listado de Productos</h2>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Imagen</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Categoría</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <% productos.forEach(producto => { %>
+
+                    <tr>
+                        <td>
+                            <img src="<%= producto.image %>" alt="<%= producto.title %>" width="100" height="100">
+                        </td>
+                        <td><%= producto.title %></td>
+                        <td><%= producto.category.nombre %></td>
+                        <td>$ <%= producto.price %></td>
+                        <td>
+                            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#verProducto<%= producto._id %>"><i class="bi bi-eye"></i></button>
+                            <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editarProducto<%= producto._id %>"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#eliminarProducto<%= producto._id %>"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
                 <% }) %>
-                <div class="card-body">
-                    <input type="hidden" id="id_<%= producto._id %>" value="<%= producto._id %>">
-                    <h5 class="card-title"><%= producto.title %></h5>
-                    <small class="card-text"><%= producto.category.nombre %></small>
-                    <div class="d-flex justify-content-between">
-                        <p class="card-text fs-5 fw-bold">$ <%= producto.price %></p>
-                    </div>
-                    <button class="btn btn-outline-primary w-100 mt-3" onclick="agregarBolsa('<%= producto._id %>', '<%= producto.title %>', '<%= producto.category.nombre %>', '<%= producto.description %>', '<%= producto.price %>', '<%= producto.images[0] %>')">Agregar al carrito</button>
-                </div>
-            </div>
-        <% }) %>
+            </tbody>
+        </table>
     </div>
 
-    <!-- Modal carrito de compras -->
+
+
+    <!-- Modal de ver producto -->
     <% productos.forEach(producto => { %>
-        <div class="modal fade" id="modalCarrito<%= producto._id %>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalCarrito" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg ">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Carrito de compras</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="d-flex gap-3 ">
-                            <img src="<%= producto.images[0] %>" alt="<%= producto.title %>" width="100">
-                            <div class="flex-wrap">
-                                <h5 class="card-title"><%= producto.title %></h5>
-                                <p class="card-text">$ <%= producto.price %></p>
-                                <input class="form-control w-25 text-center" type="number" min="1" value="1">
+        <div class="modal fade" id="verProducto<%= producto._id %>" tabindex="-1" aria-labelledby="verProductoLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Ver Producto</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between gap-3">
+                        <img src="<%= producto.image %>" alt="Imagen" width="200">
+                        <div>
+                            <p class="fw-bold m-0"><%= producto.title %></p>
+                            <small><%= producto.category.nombre %></small><br>
+                            <div class="mt-2">
+                                <small><%= producto.description %></small> 
                             </div>
+                            <p class="fw-bold mt-2">$ <%= producto.price %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    <% }) %>
+
+    <!-- Modal de editar producto -->
+    <% productos.forEach(producto => { %>
+        <div class="modal fade" id="editarProducto<%= producto._id %>" tabindex="-1" aria-labelledby="editarProductoLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Editar Producto</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/api/productos/<%= producto._id %>" method="post">
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-center">
+                            <img src="<%= producto.image%>" alt="Imagen" width="200" height="200">
+                        </div>
+                        <div class="mb-3">
+                            <label for="formFile" class="form-label">Nombre</label>
+                            <input class="form-control" type="text" id="nombre" name="nombre" value="<%= producto.title %>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="formFile" class="form-label">Descripción</label>
+                            <input class="form-control" type="text" id="descripcion" name="descripcion" value="<%= producto.description %>">
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between">
+                            <div>
+                                <label for="formFile" class="form-label">Categoria</label>
+                                <select class="form-select" name="categoria" id="categoria">
+                                    <% categorias.forEach(categoria => { %>
+                                        <option class="form-control" id="<%= categoria._id %>" value="<%= categoria._id %>"><%= categoria.nombre %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="formFile" class="form-label">Precio</label>
+                                <input class="form-control" type="number" id="precio" name="precio" value="<%= producto.price %>">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="formFile" class="form-label">Cambiar imagen</label>
+                            <input class="form-control" type="text" id="imagen" name="imagen" value="<%= producto.image %>">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <a href="bolsa" type="button" class="btn btn-primary">Ver bolsa de compras</a>
+                        <button type="submit" class="btn btn-outline-success">Editar</button>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    <% }) %>
+
+    <!-- Modal de eliminar producto -->
+    <% productos.forEach(producto => { %>
+        <div class="modal fade" id="eliminarProducto<%= producto._id %>" tabindex="-1" aria-labelledby="verProductoLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Eliminar Producto</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-between gap-3">
+                        <img src="<%= producto.image %>" alt="Imagen" width="200">
+                        <div>
+                            <p class="fw-bold m-0"><%= producto.title %></p>
+                            <small><%= producto.category.nombre %></small><br>
+                            <div class="mt-2">
+                                <small><%= producto.description %></small> 
+                            </div>
+                            <p class="fw-bold mt-2">$ <%= producto.price %></p>
+                        </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button onclick="eliminarProducto('<%= producto._id %>')" type="button" class="btn btn-outline-danger w-100">Eliminar producto</button>
+                </div>
+            </div>
             </div>
         </div>
     <% }) %>

@@ -18,12 +18,10 @@ const productoSchema = new conexion.Schema({
         ref: 'Categoria',
         required: [true, 'La categoria es obligatoria']
     },
-    images: [
-        {
-            type: String,
-            required: [true, 'Las imágenes son obligatorias']
-        }
-    ],
+    image: {
+        type: String,
+        required: [true, 'La imagen es obligatoria']
+    }
 }, { versionKey: false });
 
 const productoModel = conexion.model('Producto', productoSchema);
