@@ -4,10 +4,19 @@ const router = express.Router();
 const controladorProductos = require('../controller/producto.controller');
 const controladorCategorias = require('../controller/categoria.controller');
 const controladorUsuarios = require('../controller/usuario.controller')
-const controladorIndex = require('../controller/index.controller')
+
 
 // INDEX
-router.get('/', controladorIndex.index);
+router.get('/index', async (req, res) => {
+    res.render('pages/index');
+});
+
+
+// BOLSA DE COMPRA
+router.get('/bolsa', async (req, res) => {
+    res.render('pages/bolsaCompra');
+});
+
 
 // CATEGORIAS
 router.get('/categorias', controladorCategorias.verCategorias);

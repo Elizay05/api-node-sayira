@@ -1,4 +1,30 @@
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasBag" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <div class="d-flex flex-column">
+            <h4 class="offcanvas-title" id="offcanvasRightLabel">Tu bolsa de compras</h4>
+            <small id="totalProductosBolsa"></small>
+        </div>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="container-bag">
+
+        </div>
+        <div class="d-flex justify-content-between" id="contenedor-total">
+            <p class="fw-bold">TOTAL:</p>
+            <p class="fw-bold" id="totalBolsa"></p>
+        </div>
+        <button class="btn btn-outline-primary w-100" id="btn-pagar">Pagar</button>
+        <button class="btn btn-outline-danger w-100 mt-2" id="btn-vaciar" onclick="vaciarBolsa()">Vaciar bolsa</button>
+    </div>
+  </div>
+
+
+
+
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/2.1.5/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.1.5/js/dataTables.bootstrap5.js"></script>
+
+<script src="/js/carrito.js"></script>

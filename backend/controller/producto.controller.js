@@ -62,7 +62,7 @@ exports.actualizarProducto = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const { nombre, descripcion, precio, categoria, images } = req.body;
+        const { nombre, descripcion, precio, categoria, imagenes } = req.body;
 
         const productoActual = await productoModel.findById(id);
         if (!productoActual) {
@@ -79,7 +79,7 @@ exports.actualizarProducto = async (req, res) => {
             description: descripcion,
             price: precio,
             category: categoria,
-            images: images
+            images: imagenes
         };
 
         const actualizado = await productoModel.findByIdAndUpdate(id, productoEditado, { new: true });

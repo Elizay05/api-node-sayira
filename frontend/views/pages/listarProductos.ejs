@@ -11,7 +11,7 @@
     <%- include('../partials/header'); %>
 
 
-    
+    <!-- Tarjetas de productos -->
     <div class="d-flex justify-content-start flex-wrap gap-3 m-5">
         <% productos.forEach(producto => { %>
             <div class="card" style="width: 18rem;">
@@ -19,22 +19,46 @@
                     <img src="<%= imageUrl %>" class="card-img-top" alt="...">
                 <% }) %>
                 <div class="card-body">
+                    <input type="hidden" id="id_<%= producto._id %>" value="<%= producto._id %>">
                     <h5 class="card-title"><%= producto.title %></h5>
-                    <p class="card-text">$ <%= producto.price %></p>
-                    <small class="card-text"><%= producto._id %></small>
-                    <a href="#" class="btn btn-outline-primary"><i class="bi bi-bag"></i></a>
+                    <small class="card-text"><%= producto.category.nombre %></small>
+                    <div class="d-flex justify-content-between">
+                        <p class="card-text fs-5 fw-bold">$ <%= producto.price %></p>
+                    </div>
+                    <button class="btn btn-outline-primary w-100 mt-3" onclick="agregarBolsa('<%= producto._id %>', '<%= producto.title %>', '<%= producto.category.nombre %>', '<%= producto.description %>', '<%= producto.price %>', '<%= producto.images[0] %>')">Agregar al carrito</button>
                 </div>
             </div>
         <% }) %>
     </div>
 
-    
+    <!-- Modal carrito de compras -->
+    <% productos.forEach(producto => { %>
+        <div class="modal fade" id="modalCarrito<%= producto._id %>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalCarrito" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Carrito de compras</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex gap-3 ">
+                            <img src="<%= producto.images[0] %>" alt="<%= producto.title %>" width="100">
+                            <div class="flex-wrap">
+                                <h5 class="card-title"><%= producto.title %></h5>
+                                <p class="card-text">$ <%= producto.price %></p>
+                                <input class="form-control w-25 text-center" type="number" min="1" value="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="bolsa" type="button" class="btn btn-primary">Ver bolsa de compras</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }) %>
 
 
     <%- include ('../partials/footer'); %>
-
-    <script>
-        new DataTable('#productos');
-    </script>
 
 </body>
