@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.verProductos = async(req, res) => {
     try {
-        const productos = await productoModel.find().populate('categoria');
+        const productos = await productoModel.find();
         if (productos) {
             return productos
         } else {
@@ -30,7 +30,6 @@ exports.crearProducto = async (req, res, ruta) => {
             descripcion: req.body.descripcion,
             precio: req.body.precio,
             stock: req.body.stock,
-            categoria: req.body.categoria,
             imagen: req.body.imagen,
             habilitado: true
         };
@@ -51,7 +50,7 @@ exports.actualizarProducto = async (req, res, ruta) => {
     try {
         const { id } = req.params;
 
-        const { nombre, descripcion, precio, categoria, stock, imagen } = req.body;
+        const { nombre, descripcion, precio, stock, imagen } = req.body;
 
         const productoActual = await productoModel.findById(id);
         if (!productoActual) {
@@ -68,7 +67,6 @@ exports.actualizarProducto = async (req, res, ruta) => {
             descripcion: descripcion,
             precio: precio,
             stock: stock,
-            categoria: categoria,
             imagen: imagen,
         };
 

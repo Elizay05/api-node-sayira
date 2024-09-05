@@ -35,8 +35,6 @@ function verBolsa(){
                     <div class="col-md-8">
                         <div class="card-body pl-2 pt-1">
                             <p class="card-text fw-bold m-0">${producto.nombre}</p>
-                            <small class="card-text">${producto.categoria}</small>
-                            <br>    
                             <small class="card-text">Precio unitario: <b>$ ${producto.precio}</b></small>
                             <div class="d-flex justify-content-between mt-2">
                                 <input class="form-control text-center w-50" id="input-${producto.id}" oninput="actualizarBolsa('${producto.id}')" type="number" value="${producto.cantidad}" min="1">
@@ -57,18 +55,20 @@ function verBolsa(){
     let totalProductosBolsa = document.getElementById('totalProductosBolsa');
     totalProductosBolsa.innerText = 'Productos: (' + bolsa.length + ')';
 
+    let badgeTotalBolsa = document.getElementById('badgeTotalBolsa');
+    badgeTotalBolsa.innerText = bolsa.length
+
     actualizarTotal();
 }
 
 
-function agregarBolsa(_id, referencia, nombre, categoria, descripcion, precio, stock, imagenes, habilitado){
+function agregarBolsa(_id, referencia, nombre, descripcion, precio, stock, imagenes, habilitado){
     let bolsa = JSON.parse(localStorage.getItem('bolsa')) || [];
     
     let producto = {
         'id': _id,
         'referencia': referencia,
         'nombre': nombre,
-        'categoria': categoria,
         'descripcion': descripcion,
         'precio': precio,
         'stock': stock,

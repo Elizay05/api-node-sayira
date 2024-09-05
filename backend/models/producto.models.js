@@ -23,11 +23,6 @@ const productoSchema = new conexion.Schema({
         default: [0, 'El stock por defecto es cero'],
         min: [0, 'El stock por defecto es cero']
     },
-    categoria: {
-        type: conexion.SchemaTypes.ObjectId,
-        ref: 'Categoria',
-        required: [true, 'La categoria es obligatoria']
-    },
     imagen: {
         type: String,
         required: [true, 'no existe la imagen o ruta']
