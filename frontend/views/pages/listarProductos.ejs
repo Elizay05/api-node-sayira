@@ -15,12 +15,15 @@
     <div class="m-5">
         <h2 class="text-center m-5">Listado de Productos</h2>
 
-        <table class="table table-striped">
+        <button class="btn btn-outline-success mb-4" data-bs-toggle="modal" data-bs-target="#agregarProducto">Agregar producto <i class="bi bi-plus-circle"></i></button>
+
+        <table class="table">
             <thead>
                 <tr>
                     <th scope="col">Imagen</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Categoría</th>
+                    <th scope="col">Stock</th>
                     <th scope="col">Precio</th>
                     <th scope="col">Acciones</th>
                 </tr>
@@ -31,11 +34,12 @@
 
                     <tr>
                         <td>
-                            <img src="<%= producto.image %>" alt="<%= producto.title %>" width="100" height="100">
+                            <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>" width="100" height="100">
                         </td>
-                        <td><%= producto.title %></td>
-                        <td><%= producto.category.nombre %></td>
-                        <td>$ <%= producto.price %></td>
+                        <td><%= producto.nombre %></td>
+                        <td><%= producto.categoria.nombre %></td>
+                        <td><%= producto.stock %></td>
+                        <td>$ <%= producto.precio %></td>
                         <td>
                             <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#verProducto<%= producto._id %>"><i class="bi bi-eye"></i></button>
                             <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editarProducto<%= producto._id %>"><i class="bi bi-pencil-square"></i></button>
@@ -48,7 +52,6 @@
     </div>
 
 
-
     <!-- Modal de ver producto -->
     <% productos.forEach(producto => { %>
         <div class="modal fade" id="verProducto<%= producto._id %>" tabindex="-1" aria-labelledby="verProductoLabel" aria-hidden="true">
@@ -59,15 +62,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="d-flex justify-content-between gap-3">
-                        <img src="<%= producto.image %>" alt="Imagen" width="200">
+                    <div class="d-flex gap-3">
+                        <img src="<%= producto.imagen %>" alt="Imagen" width="200" height="200">
                         <div>
-                            <p class="fw-bold m-0"><%= producto.title %></p>
-                            <small><%= producto.category.nombre %></small><br>
+                            <p class="fw-bold m-0"><%= producto.nombre %></p>
+                            <small><%= producto.categoria.nombre %></small><br>
                             <div class="mt-2">
-                                <small><%= producto.description %></small> 
+                                <small><%= producto.descripcion %></small> 
                             </div>
-                            <p class="fw-bold mt-2">$ <%= producto.price %></p>
+                            <div class="mt-2">
+                                <small>stock: <%= producto.stock %></small>
+                            </div>
+                            <p class="fw-bold mt-2">$ <%= producto.precio %></p>
                         </div>
                     </div>
                 </div>
@@ -75,6 +81,56 @@
             </div>
         </div>
     <% }) %>
+
+
+    <!-- Modal de agregar producto -->
+    <div class="modal fade" id="agregarProducto" tabindex="-1" aria-labelledby="agregarProductoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Agregar Producto</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/api/productos" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Nombre</label>
+                        <input class="form-control" type="text" id="nombre" name="nombre">
+                    </div>
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Descripción</label>
+                        <input class="form-control" type="text" id="descripcion" name="descripcion">
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between gap-3">
+                        <div>
+                            <label for="formFile" class="form-label">Categoria</label>
+                            <select class="form-select" name="categoria" id="categoria">
+                                <% categorias.forEach(categoria => { %>
+                                    <option class="form-control" id="<%= categoria._id %>" value="<%= categoria._id %>"><%= categoria.nombre %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="formFile" class="form-label">Precio</label>
+                            <input class="form-control" type="number" id="precio" name="precio">
+                        </div>
+                        <div>
+                            <label for="formFile" class="form-label">Stock</label>
+                            <input class="form-control" type="text" id="stock" name="stock">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="formFile" class="form-label">Cambiar imagen</label>
+                        <input class="form-control" type="text" id="imagen" name="imagen"">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-outline-success w-100">Agregar</button>
+                </div>
+            </form>
+        </div>
+        </div>
+    </div>
 
     <!-- Modal de editar producto -->
     <% productos.forEach(producto => { %>
@@ -88,37 +144,41 @@
                 <form action="/api/productos/<%= producto._id %>" method="post">
                     <div class="modal-body">
                         <div class="d-flex justify-content-center">
-                            <img src="<%= producto.image%>" alt="Imagen" width="200" height="200">
+                            <img src="<%= producto.imagen%>" alt="<%= producto.nombre %>" class="rounded" width="150" height="150">
                         </div>
                         <div class="mb-3">
                             <label for="formFile" class="form-label">Nombre</label>
-                            <input class="form-control" type="text" id="nombre" name="nombre" value="<%= producto.title %>">
+                            <input class="form-control" type="text" id="nombre" name="nombre" value="<%= producto.nombre %>">
                         </div>
                         <div class="mb-3">
                             <label for="formFile" class="form-label">Descripción</label>
-                            <input class="form-control" type="text" id="descripcion" name="descripcion" value="<%= producto.description %>">
+                            <input class="form-control" type="text" id="descripcion" name="descripcion" value="<%= producto.descripcion %>">
                         </div>
-                        <div class="mb-3 d-flex justify-content-between">
+                        <div class="mb-3 d-flex justify-content-between gap-3">
                             <div>
                                 <label for="formFile" class="form-label">Categoria</label>
                                 <select class="form-select" name="categoria" id="categoria">
                                     <% categorias.forEach(categoria => { %>
-                                        <option class="form-control" id="<%= categoria._id %>" value="<%= categoria._id %>"><%= categoria.nombre %></option>
+                                        <option class="form-control w-75" id="<%= categoria._id %>" value="<%= categoria._id %>"><%= categoria.nombre %></option>
                                     <% }) %>
                                 </select>
                             </div>
                             <div>
                                 <label for="formFile" class="form-label">Precio</label>
-                                <input class="form-control" type="number" id="precio" name="precio" value="<%= producto.price %>">
+                                <input class="form-control" type="number" id="precio" name="precio" value="<%= producto.precio %>">
+                            </div>
+                            <div>
+                                <label for="formFile" class="form-label">Stock</label>
+                                <input class="form-control" type="text" id="stock" name="stock" value="<%= producto.stock %>">
                             </div>
                         </div>
                         <div>
-                            <label for="formFile" class="form-label">Cambiar imagen</label>
-                            <input class="form-control" type="text" id="imagen" name="imagen" value="<%= producto.image %>">
+                            <label for="formFile" class="form-label">Agregar imagen</label>
+                            <input class="form-control" type="text" id="imagen" name="imagen" value="<%= producto.imagen %>">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-outline-success">Editar</button>
+                        <button type="submit" class="btn btn-outline-success w-100">Editar</button>
                     </div>
                 </form>
             </div>
@@ -136,15 +196,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="d-flex justify-content-between gap-3">
-                        <img src="<%= producto.image %>" alt="Imagen" width="200">
+                    <div class="d-flex gap-3">
+                        <img src="<%= producto.imagen %>" alt="Imagen" width="200" height="200">
                         <div>
-                            <p class="fw-bold m-0"><%= producto.title %></p>
-                            <small><%= producto.category.nombre %></small><br>
+                            <p class="fw-bold m-0"><%= producto.nombre %></p>
+                            <small><%= producto.categoria.nombre %></small><br>
                             <div class="mt-2">
-                                <small><%= producto.description %></small> 
+                                <small><%= producto.descripcion %></small> 
                             </div>
-                            <p class="fw-bold mt-2">$ <%= producto.price %></p>
+                            <div class="mt-2">
+                                <small>stock: <%= producto.stock %></small>
+                            </div>
+                            <p class="fw-bold mt-2">$ <%= producto.precio %></p>
                         </div>
                     </div>
                 </div>

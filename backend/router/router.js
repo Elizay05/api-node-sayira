@@ -28,15 +28,18 @@ router.get('/productos', async (req, res) => {
     res.render('pages/listarProductos', {productos, categorias})
 });
 
-router.get('/productos/:id', controladorProductos.verProducto);
 
-router.post('/productos', controladorProductos.crearProducto);
+router.post('/productos', async (req, res) => {
+    controladorProductos.crearProducto(req, res, '/api/productos');
+});
 
 router.post('/productos/:id', async (req, res) => {
     controladorProductos.actualizarProducto(req, res, '/api/productos');
 });
 
-router.delete('/productos/:id', controladorProductos.eliminarProducto);
+router.delete('/productos/:id', async (req, res) => {
+    controladorProductos.eliminarProducto(req, res, '/api/productos');
+});
 
 // USUARIOS
 router.get('/usuarios', controladorUsuarios.verUsuarios);

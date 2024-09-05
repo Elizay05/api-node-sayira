@@ -1,28 +1,42 @@
 const conexion = require('../config/connection');
 
 const productoSchema = new conexion.Schema({
-    title: {
+    referencia: {
         type: String,
-        required: [true, 'El título es obligatorio']
+        required: [true, 'La referencia es obligatoria']
     },
-    description: {
+    nombre: {
         type: String,
-        required: [true, 'La descripción es obligatoria']
+        required: [true, 'Asignar un nombre es obligatorio']
     },
-    price: {
+    descripcion: {
+        type: String,
+        required: [true, 'La descripcion es obligatoria']
+    },
+    precio: {
         type: Number,
-        required: [true, 'El precio es obligatorio']
+        default: [0, 'El precio por defecto es cero'],
+        min: [0, 'El precio mínimo es cero']
     },
-    category: {
+    stock: {
+        type: Number,
+        default: [0, 'El stock por defecto es cero'],
+        min: [0, 'El stock por defecto es cero']
+    },
+    categoria: {
         type: conexion.SchemaTypes.ObjectId,
         ref: 'Categoria',
         required: [true, 'La categoria es obligatoria']
     },
-    image: {
+    imagen: {
         type: String,
-        required: [true, 'La imagen es obligatoria']
+        required: [true, 'no existe la imagen o ruta']
+    },
+    habilitado: {
+        type: Boolean,
+        default: true
     }
-}, { versionKey: false });
+},{ versionKey: false });
 
 const productoModel = conexion.model('Producto', productoSchema);
 

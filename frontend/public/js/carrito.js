@@ -61,22 +61,23 @@ function verBolsa(){
 }
 
 
-function agregarBolsa(productoId, nombre, categoria, descripcion, precio, imagenes){
+function agregarBolsa(_id, referencia, nombre, categoria, descripcion, precio, stock, imagenes, habilitado){
     let bolsa = JSON.parse(localStorage.getItem('bolsa')) || [];
     
-    console.log(productoId, nombre, categoria, descripcion, precio, imagenes)
-
     let producto = {
-        'id': productoId,
+        'id': _id,
+        'referencia': referencia,
         'nombre': nombre,
         'categoria': categoria,
         'descripcion': descripcion,
         'precio': precio,
+        'stock': stock,
         'imagenes': imagenes,
-        'cantidad': 1
+        'cantidad': 1,
+        'habilitado': habilitado
     }
 
-    let index = bolsa.findIndex(producto => producto.id === productoId);
+    let index = bolsa.findIndex(producto => producto.id === _id);
     if(index === -1){
         bolsa.push(producto);
     }else{
@@ -93,14 +94,14 @@ function agregarBolsa(productoId, nombre, categoria, descripcion, precio, imagen
 }
 
 
-function actualizarBolsa(productoId) {
+function actualizarBolsa(_id) {
     let bolsa = obtenerBolsa();
-    let inputCantidad = document.getElementById(`input-${productoId}`);
+    let inputCantidad = document.getElementById(`input-${_id}`);
     let nuevaCantidad = parseInt(inputCantidad.value, 10);
 
     console.log(inputCantidad.value);
 
-    let index = bolsa.findIndex(producto => producto.id === productoId);
+    let index = bolsa.findIndex(producto => producto.id === _id);
     if (index !== -1 && nuevaCantidad > 0) {
         bolsa[index].cantidad = nuevaCantidad;
     } else if (index !== -1 && nuevaCantidad <= 0) {
@@ -123,9 +124,9 @@ function actualizarTotal(){
     document.getElementById('totalBolsa').innerText = '$ ' + total;
 }
 
-function eliminarDeBolsa(productoId){
+function eliminarDeBolsa(_id){
     let bolsa = obtenerBolsa();
-    let index = bolsa.findIndex(producto => producto.id === productoId);
+    let index = bolsa.findIndex(producto => producto.id === _id);
     
     if(index === -1){
         return;
@@ -150,11 +151,11 @@ function vaciarBolsa(){
 
 function eliminarProducto(id){
     $.ajax({
-        url: `/productos/${referencia}`,
+        url: `/api/productos/${id}`,
         type: 'DELETE',
         success: function(result){
             console.log(result);
-            window.location.href = '/';
+            window.location.href = `${result}`;
         },error: function(err){
             console.log(err);
         }

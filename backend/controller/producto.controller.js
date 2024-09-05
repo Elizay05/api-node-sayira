@@ -1,8 +1,10 @@
 const productoModel = require('../models/producto.models');
 
+const { v4: uuidv4 } = require('uuid');
+
 exports.verProductos = async(req, res) => {
     try {
-        const productos = await productoModel.find().populate('category');
+        const productos = await productoModel.find().populate('categoria');
         if (productos) {
             return productos
         } else {
@@ -14,23 +16,7 @@ exports.verProductos = async(req, res) => {
 }
 
 
-exports.verProducto = async (req, res) => {
-    try {
-
-        const producto = await productoModel.findById(req.params.id).populate('category');
-
-        if (producto) {
-            res.status(200).json(producto);
-        } else {
-            res.status(404).json({ message: 'Producto no encontrado' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: "Ocurrio un error al obtener el producto:", error: error.message });
-    }
-}
-
-
-exports.crearProducto = async (req, res) => {
+exports.crearProducto = async (req, res, ruta) => {
     try {
 
         const productoExistente = await productoModel.findOne({ title: req.body.nombre });
@@ -39,16 +25,19 @@ exports.crearProducto = async (req, res) => {
         }
 
         const nuevo = {
-            title: req.body.nombre,
-            description: req.body.descripcion,
-            price: req.body.precio,
-            category: req.body.categoria,
-            images: req.body.imagenes
+            referencia: uuidv4(),
+            nombre: req.body.nombre,
+            descripcion: req.body.descripcion,
+            precio: req.body.precio,
+            stock: req.body.stock,
+            categoria: req.body.categoria,
+            imagen: req.body.imagen,
+            habilitado: true
         };
 
         let productoNuevo = await productoModel.create(nuevo);
         if (productoNuevo) {
-            res.status(200).json(productoNuevo);
+            res.redirect(ruta);
         } else {
             res.status(404).json({ message: 'No se pudo registrar el producto' });
         }
@@ -62,7 +51,7 @@ exports.actualizarProducto = async (req, res, ruta) => {
     try {
         const { id } = req.params;
 
-        const { nombre, descripcion, precio, categoria, imagen } = req.body;
+        const { nombre, descripcion, precio, categoria, stock, imagen } = req.body;
 
         const productoActual = await productoModel.findById(id);
         if (!productoActual) {
@@ -75,11 +64,12 @@ exports.actualizarProducto = async (req, res, ruta) => {
         }
         
         const productoEditado = {
-            title: nombre,
-            description: descripcion,
-            price: precio,
-            category: categoria,
-            image: imagen
+            nombre: nombre,
+            descripcion: descripcion,
+            precio: precio,
+            stock: stock,
+            categoria: categoria,
+            imagen: imagen,
         };
 
         const actualizado = await productoModel.findByIdAndUpdate(id, productoEditado, { new: true });
@@ -95,14 +85,14 @@ exports.actualizarProducto = async (req, res, ruta) => {
 }
 
 
-exports.eliminarProducto = async (req, res) => {
+exports.eliminarProducto = async (req, res, ruta) => {
     try {
         const { id } = req.params;
 
-        const producto = await productoModel.findByIdAndDelete(id);
+        const producto = await productoModel.findByIdAndDelete({_id: id});
         
         if (producto) {
-            res.status(200).json({ message: 'Producto eliminado correctamente', producto });
+            res.send(ruta);
         } else {
             res.status(404).json({ message: 'Producto no encontrado' });
         }
